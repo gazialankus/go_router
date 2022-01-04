@@ -43,54 +43,51 @@ class FamilyTabsScreen extends StatefulWidget {
 }
 
 const numPages = 3;
-class _FamilyTabsScreenState extends State<FamilyTabsScreen>
-    with TickerProviderStateMixin {
-  late final TabController _controller;
+class _FamilyTabsScreenState extends State<FamilyTabsScreen> {
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = TabController(
-      length: numPages,
-      vsync: this,
-      initialIndex: widget.index,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  int activeIndex = 0;
 
   @override
   void didUpdateWidget(FamilyTabsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _controller.index = widget.index;
+    activeIndex = widget.index;
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text(App.title),
-          bottom: TabBar(
-            controller: _controller,
-            tabs: [
-              for (int i = 0; i < numPages; ++i)
-                Tab(text: i.toString())
-            ],
-            onTap: (index) => _tap(context, index),
-          ),
+          title: const Counter(),
+          actions: [0, 1, 2].map((e) => ElevatedButton(
+            onPressed: () {
+              _tap(context, e);
+            },
+            child: Text(e.toString()),
+          )).toList(),
         ),
-        body: TabBarView(
-          controller: _controller,
-          children: [
-            for (int i = 0; i < numPages; ++i)
-              Text(i.toString())
-          ],
-        ),
+        body: Text(activeIndex.toString()),
       );
 
   void _tap(BuildContext context, int index) =>
       context.go('/$index');
+}
+
+
+class Counter extends StatefulWidget {
+  const Counter({Key? key}) : super(key: key);
+
+  @override
+  _CounterState createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int count = 0;
+  @override
+  Widget build(BuildContext context) => ElevatedButton(
+      onPressed: () {
+        setState(() {
+          count++;
+        });
+      },
+      child: Text('$count'),
+    );
 }
