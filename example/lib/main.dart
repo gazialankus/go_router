@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 void main() => runApp(App());
 
+// GlobalKey globalKey = GlobalKey();
+
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
 
@@ -19,29 +21,73 @@ class App extends StatelessWidget {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const Page1Screen(),
+        redirect: (_) => '/0',
       ),
       GoRoute(
-        path: '/page2',
-        builder: (context, state) => const Page2Screen(),
+        path: '/0',
+        builder: (context, state) => PageScreen(
+          pageIndex: 0,
+          key: state.pageKey,
+        ),
       ),
+      GoRoute(
+        path: '/1',
+        builder: (context, state) => PageScreen(
+          pageIndex: 1,
+          key: state.pageKey,
+        ),
+      ),
+      GoRoute(
+        path: '/2',
+        builder: (context, state) => PageScreen(
+          pageIndex: 2,
+          key: state.pageKey,
+        ),
+      ),
+      // using this instead of the above three makes the appbar stay on
+      // GoRoute(
+      //   path: '/:index',
+      //   builder: (context, state) => PageScreen(
+      //     pageIndex: int.parse(state.params['index']!),
+      //     key: state.pageKey,
+      //   ),
+      // ),
+
     ],
   );
 }
 
-class Page1Screen extends StatelessWidget {
-  const Page1Screen({Key? key}) : super(key: key);
+class PageScreen extends StatefulWidget {
+  const PageScreen({required this.pageIndex, Key? key}) : super(key: key);
+
+  final int pageIndex;
+
+  @override
+  State<PageScreen> createState() => _PageScreenState();
+}
+
+class _PageScreenState extends State<PageScreen> {
+  int target = 0;
+
+  @override
+  void didUpdateWidget(covariant PageScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    target = widget.pageIndex;
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text(App.title)),
+        appBar: AppBar(
+          title: const Counter(),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text('Page $target'),
               ElevatedButton(
-                onPressed: () => context.go('/page2'),
-                child: const Text('Go to page 2'),
+                onPressed: () => context.go('/${target + 1}'),
+                child: Text('Go to ${target + 1}'),
               ),
             ],
           ),
@@ -49,22 +95,22 @@ class Page1Screen extends StatelessWidget {
       );
 }
 
-class Page2Screen extends StatelessWidget {
-  const Page2Screen({Key? key}) : super(key: key);
+class Counter extends StatefulWidget {
+  const Counter({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text(App.title)),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => context.go('/'),
-                child: const Text('Go to home page'),
-              ),
-            ],
-          ),
-        ),
-      );
+  _CounterState createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int count = 0;
+  @override
+  Widget build(BuildContext context) => ElevatedButton(
+    onPressed: () {
+      setState(() {
+        count++;
+      });
+    },
+    child: Text('The top widget that stays with it state: $count'),
+  );
 }
